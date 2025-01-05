@@ -1,4 +1,6 @@
-﻿@{
+﻿@using Web.Features
+
+@{
     ViewData["Title"] = "Home Page";
 }
 <div class="row">
@@ -31,20 +33,85 @@
     <div class="col">
         <div class="mb-5">
             <h3>Add your solution to question 2 here</h3>
+            @{
+                // TempData is used to store the total number of clicks for question 3.
+                int totalClicks = TempData["TotalClicks"] as int? ?? 0;
+                TempData.Keep("TotalClicks");
 
-            <p><button>Increment number by 1</button></p>
-            <p><span>1</span></p>
+                // If the request is a POST request, increment the total number of clicks.
+                if (Context.Request.Method == "POST" && Context.Request.Form.ContainsKey("TotalClicks"))
+                {
+                    // Retrieve the total number of clicks from the form and increments it.
+                    int.TryParse(Context.Request.Form["TotalClicks"], out totalClicks);
+                    var incrementService = new Increment();
+                    totalClicks = incrementService.IncrementValue(totalClicks);
+                    TempData["TotalClicks"] = totalClicks;
+                }
+            }
+            <form method="post">
+                <input type="hidden" name="TotalClicks" value="@totalClicks" />
+                <p><button type="submit"submit">Increment number by 1</button></p>
+                <p><span>@totalClicks</span></p>
+            </form>
             <hr/>
         </div>
 
         <div class="mb-5">
             <h3>Add your solution to question 3 here</h3>
+            @{
+                string inputString = "";
+                string outputString = "";
+
+                if (Context.Request.Method == "POST" && Context.Request.Form.ContainsKey("string"))
+                {
+                    // Retrieve input string from the form
+                    inputString = Context.Request.Form["string"]; 
+
+                    // Reverse the string
+                    var reverse = new ReverseString();
+                    outputString = reverse.Reverse(inputString);
+
+                    // Persist output string using TempData
+                    TempData["OutputString"] = outputString;
+                }
+                else if (TempData["OutputString"] != null)
+                {
+                    // Retrieve reversed string from TempData if available
+                    outputString = TempData["OutputString"]?.ToString() ?? string.Empty;
+                }
+            }
+
+            <form id="clickForm" method="post">
+                <label for="string">Enter String to Reverse:</label>
+                <input type="text" id="string" name="string" placeholder="Enter String to Reverse" required value="@inputString" />
+                <p><button type="submit">Reverse String</button></p>
+            </form>
+
+            @if (!string.IsNullOrEmpty(outputString))
+            {
+                <div>
+                    <p><strong>Reversed String:</strong> @outputString</p>
+                </div>
+            }
             <hr/>
         </div>
 
         <div class="mb-5">
             <h4>How did you find this assessment?</h4>
-            @* Write here *@
+            @* 
+                Q1. Hot reload enabled to allow for changes to be made to the razor page without restarting the application.
+
+                Q2. Creates an instance of the Increment class to handle the incrementation of the total number of clicks. TempData.Keep used to persist the total number of clicks.
+
+                Q3. Created a second View that displays the number of times the button was pressed on the first page. TempData used to retrieve the total number of clicks.
+
+                Q4. Created a button that takes a string as an input and reverses it. ReverseString feature created in FeaturesFolder to handle the string reversal. TempData used to persist the reversed string. Due to multiple form submissions on same page, we ensure we check the key exists in the form collection before trying to access it.
+
+                -- This assignment was very engaging and emphasised the use of Tempdata to persist data between requests. Opted to use FeaturesFolders to follow good architectural practices and to ensure the code is re-usable, scalable and all the other good stuff.
+
+                -- p.s I spent most of the time writing a final review for the assessment :), Looking forward to the next steps!
+
+             *@
         </div>
     </div>
 </div>

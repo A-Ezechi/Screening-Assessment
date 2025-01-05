@@ -1,0 +1,18 @@
+@using Web.Features
+
+@{
+    ViewData["Title"] = "ClickNumber";
+    int count = TempData["TotalClicks"] as int? ?? 0;
+
+    TempData.Keep("TotalClicks");
+}
+
+<header>
+    <h1>Number of Clicks</h1>
+</header>
+
+<main>
+    <div class="text-center">
+        <p>The button was pressed: <strong>@count</strong> times.</p>
+    </div>
+</main>
